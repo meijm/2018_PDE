@@ -3,12 +3,13 @@
 %%
 %*********************************initial conditions**********************
 clear all, clc, close all
-dt = 0.001;
+dt = 0.0013;
 dx = 0.05;
 Tf=0.1;
+XJ=1;
 
 %initial conditions
-u0 = @(x) 1-2*(x-1/2).*sign(x-1/2);
+u0 = @(x) 1-2*(x-1/2).*sign(x-1/2);%that's amazing!
 
 %Dirichlet boundary conditions
 left = @(x) 0*x; %the left boundary condition
@@ -18,9 +19,9 @@ right = @(x) 0*x; %the right bondary conditon
 mu = dt/(dx^2);
 
 tvals=0:dt:Tf;
-xvals=0:dx:1;
+xvals=0:dx:XJ;
 
-J=length(xvals);
+J=length(xvals);%the J is the real J+1,count from 1.
 N=length(tvals);
 %Note: the original index j runs from j=1(x=0) to j=J(x=1)
 %%
@@ -28,7 +29,7 @@ N=length(tvals);
 %theta=0; explicit
 %theta=1; implicit
 %theta=1/2 Crank-Nicolson 
-theta =1;
+theta =0;
 switch theta
     case 0
         scheme=' Explicit';
@@ -59,9 +60,10 @@ A(J,:)=0;A(J,J)=1;
 %********************************time iteration****************************
 for n=1:N-1
     rhs=B*u(:,n);
-    rhs([1,J])=0;%the boundary condition is zero
     y=L\rhs;
-    u(:,n+1)=U\y;
+    u_n1=U\y;
+    u_n1([1,J])=[left(0),right(XJ)];%the boundary condition is zero
+    u(:,n+1)=u_n1;
 end
 for t=1:10:N
     u_t=u(:,t);
@@ -69,11 +71,14 @@ for t=1:10:N
     hold on
 end
 hold off
+xlabel('x')
+ylabel('u')
+title(strcat('Numerical solution at different times using ',scheme,', \mu= ',num2str(mu)))
 figure
 
-%surf(xvals,tvals,u')
-[X,Y]=meshgrid(xvals,tvals);
-surf(X,Y,u');
+surf(xvals,tvals,u')
+%[X,Y]=meshgrid(xvals,tvals);
+%surf(X,Y,u');
 xlabel('x')
 ylabel('t')
 zlabel('u')

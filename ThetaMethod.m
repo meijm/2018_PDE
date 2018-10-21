@@ -29,7 +29,7 @@ N=length(tvals);
 %theta=0; explicit
 %theta=1; implicit
 %theta=1/2 Crank-Nicolson 
-theta =0;
+theta =1;
 switch theta
     case 0
         scheme=' Explicit';
